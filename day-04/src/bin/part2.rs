@@ -16,7 +16,7 @@ fn proccess(input: &str) -> u32 {
         .map(|(a, b)| (a, (b.0.split_whitespace(), b.1.split_whitespace())))
         .map(|(a, b)| {
             (
-                a.parse::<u32>().unwrap(),
+                a.trim().parse::<i32>().unwrap(),
                 (
                     b.0.map(|n| n.parse::<u32>().unwrap()).collect::<Vec<u32>>(),
                     b.1.map(|n| n.parse::<u32>().unwrap()).collect::<Vec<u32>>(),
@@ -26,16 +26,31 @@ fn proccess(input: &str) -> u32 {
         .for_each(|(a, b)| {
             cards.insert(
                 a,
-                b.1.iter()
-                    .filter(|n| b.0.contains(n))
-                    .collect::<Vec<&u32>>()
-                    .len(),
+                (a + 1
+                    ..a + 1
+                        + b.1
+                            .iter()
+                            .filter(|n| b.0.contains(n))
+                            .collect::<Vec<&u32>>()
+                            .len() as i32)
+                    .collect::<Vec<i32>>(),
             );
         });
 
-    println!("{:?}", cards);
+    let mut stack = cards.keys().collect::<Vec<&i32>>();
+    let mut res = 0;
 
-    0
+    while !stack.is_empty() {
+        res += 1;
+
+        cards
+            .get(stack.pop().unwrap())
+            .unwrap()
+            .iter()
+            .for_each(|n| stack.push(n));
+    }
+
+    res
 }
 
 #[cfg(test)]
